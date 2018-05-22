@@ -22,7 +22,7 @@ from muscle_visualization import MuscleVisualization
 import numpy as np
 
 # VARIABLE TO TURN ON/OFF MUSCLE VISUALIZATION
-MUSCLE_VISUALIZATION = False
+MUSCLE_VISUALIZATION = True
 
 # TRAJECTORIES BUFFER SIZE, CAN BE INCREASED FOR LONGER SIMULATIONS
 BUFFER_SIZE_TRAJECTORIES = int(1e6)
@@ -396,7 +396,7 @@ class ReflexParams():
     'Touch down to stance':False,'Lift off to swing':False,'Coupling':False}
     
     def __init__(self):
-            print 'Initiate reflexes param'
+        print 'Initiate reflexes param'
     def set_activation(self,key,idx,value):
         try:
             self.activation[key][idx]=float(value)/100.0
@@ -420,7 +420,6 @@ class ReflexParams():
             print 'Error in toggle'
 
     def set_transitions(self,key,value):
-        print key
         try:
             max_val=self.transition_boundaries[key][1]
             min_val=self.transition_boundaries[key][0]
@@ -477,6 +476,11 @@ class MainWindow(QMainWindow):
         radio_couple.toggled.connect(lambda : params_obj.toggle('Coupling'))
         grid.addWidget(radio_couple,4,1)
         
+        radio_res=QRadioButton('Reset sim')
+        radio_res.setChecked(False)
+        radio_res.toggled.connect(self.reset_sim)
+        grid.addWidget(radio_res,4,2)
+        
         self.sim_thread=QThread()
         self.th_mouse.moveToThread(self.sim_thread)
         self.sim_thread.started.connect(self.th_mouse.run)
@@ -488,7 +492,12 @@ class MainWindow(QMainWindow):
         self.show()
         self.sim_thread.start()
         print 'Show'
-
+    def reset_sim(self):
+        self.sim_thread.quit()
+        self.th_mouse.mouse.simulationResetPhysics()
+        self.th_mouse.moveToThread(self.sim_thread)
+        self.sim_thread.started.connect(self.th_mouse.run)
+        self.sim_thread.start()
     def createActivation(self,key,n_values,value_cb,toggle_cb):
         #print key
         groupBox = QGroupBox(key)
@@ -509,6 +518,7 @@ class MainWindow(QMainWindow):
         slider.setTickInterval(10)
         slider.setTickPosition(1)
         slider.setSingleStep(1)
+        slider.setValue(5)
         slider.sliderReleased.connect(lambda :cb_method(key,idx,slider.value()))
         return slider
         
@@ -519,8 +529,9 @@ class MainWindow(QMainWindow):
         slider.setFocusPolicy(Qt.StrongFocus)
         slider.setTickPosition(QSlider.TicksBothSides)
         slider.setTickInterval(10)
-        slider.setTickPosition(1)
+        slider.setTickPosition(5)
         slider.setSingleStep(1)
+        slider.setValue(50)
         slider.sliderReleased.connect(lambda :value_cb(key,slider.value()))
         vbox.addWidget(slider)
         vbox.addStretch(1)
