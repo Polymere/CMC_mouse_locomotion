@@ -114,8 +114,7 @@ class Mouse(Supervisor):
             # TO ENABLE/DISABLE REFLEX STATE ANYTIME DURING THE SIMULATION
             # DO IT HERE
 
-            # # if (self.getTime() == 1.):
-            # #     reflex.COUPLING = False
+            reflex.COUPLING=self.params.enable['Coupling']
 
             # Reflex model
             reflex.step(
@@ -394,7 +393,7 @@ class ReflexParams():
     'Lift off to swing':[0.05,0.05]}
     
     enable={'Stance to lift off':False,'Swing to touch down':False,
-    'Touch down to stance':False,'Lift off to swing':False}
+    'Touch down to stance':False,'Lift off to swing':False,'Coupling':False}
     
     def __init__(self):
             print 'Initiate reflexes param'
@@ -425,7 +424,7 @@ class ReflexParams():
         try:
             max_val=self.transition_boundaries[key][1]
             min_val=self.transition_boundaries[key][0]
-            self.transitions[key]=value*max_val/(100*(max_val-min_val))-min_val
+            self.transitions[key]=value*(max_val-min_val)/100+min_val
             # linear between max_val and min_val (value ranges from 0 to 100)
             print key +' set to ' + str(self.transitions[key])
         except KeyError:
@@ -473,6 +472,11 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.createReflex(params_obj.set_transitions,key='Ankle unloading liftoff'), 2, 1)
         grid.addWidget(self.createReflex(params_obj.set_transitions,key='Hip angle touchdown'), 3, 0)
         grid.addWidget(self.createReflex(params_obj.set_transitions,key='Ankle unloading touchdown'), 3, 1)
+        radio_couple=QRadioButton('Coupling')
+        radio_couple.setChecked(False)
+        radio_couple.toggled.connect(lambda : params_obj.toggle('Coupling'))
+        grid.addWidget(radio_couple,4,1)
+        
         self.sim_thread=QThread()
         self.th_mouse.moveToThread(self.sim_thread)
         self.sim_thread.started.connect(self.th_mouse.run)

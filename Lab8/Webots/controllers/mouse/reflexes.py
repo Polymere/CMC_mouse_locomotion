@@ -307,8 +307,9 @@ class Reflexes(object):
         value: bool
             Set whether cross coupling between legs is active or not
         """
-        print(('CHANGING COUPLING State to {}'.format(value)))
-        self._COUPLING = value
+        if value !=self._COUPLING:
+            print(('CHANGING COUPLING State to {}'.format(value)))
+            self._COUPLING = value
 
     @property
     def HIP_EXTENSION_RULE(self):
