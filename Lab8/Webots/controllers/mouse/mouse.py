@@ -414,6 +414,7 @@ class ReflexParams():
             print 'Error in toggle'
 
     def set_transitions(self,key,value):
+        print key
         try:
             self.transitions[key]=value
             print key +' set to ' + str(value)
@@ -433,10 +434,12 @@ class ReflexParams():
         for trigger,transition in self.transitions.items():
             print trigger
             print transition
+
         print 'Activated steps are :'
         for step,activated in self.enable.items():
             if activated:
                 print step
+
           
 class MainWindow(QMainWindow):
     def __init__(self,params_obj):
@@ -456,15 +459,13 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.createActivation('Lift off to swing',2,
                                             params_obj.set_activation,params_obj.toggle), 1, 1)
 
-        grid.addWidget(self.createReflex(key='Hip angle liftoff'), 2, 0)
-        grid.addWidget(self.createReflex(key='Ankle unloading liftoff'), 2, 1)
-        grid.addWidget(self.createReflex(key='Hip angle touchdown'), 3, 0)
-        grid.addWidget(self.createReflex(key='Ankle unloading touchdown'), 3, 1)
+        grid.addWidget(self.createReflex(params_obj.set_transitions,key='Hip angle liftoff'), 2, 0)
+        grid.addWidget(self.createReflex(params_obj.set_transitions,key='Ankle unloading liftoff'), 2, 1)
+        grid.addWidget(self.createReflex(params_obj.set_transitions,key='Hip angle touchdown'), 3, 0)
+        grid.addWidget(self.createReflex(params_obj.set_transitions,key='Ankle unloading touchdown'), 3, 1)
         self.sim_thread=QThread()
         self.th_mouse.moveToThread(self.sim_thread)
         self.sim_thread.started.connect(self.th_mouse.run)
-        
-
         self.w=QWidget()
         self.w.setLayout(grid)
         self.setCentralWidget(self.w)
@@ -496,14 +497,17 @@ class MainWindow(QMainWindow):
         slider.setSingleStep(1)
         slider.sliderReleased.connect(lambda :cb_method(key,idx,slider.value()))
         return slider
-    def createReflex(self,key='Default'):
+        
+    def createReflex(self,value_cb,key='Default'):
         groupBox = QGroupBox(key)
         vbox = QVBoxLayout()
         slider = QSlider(Qt.Horizontal)
         slider.setFocusPolicy(Qt.StrongFocus)
         slider.setTickPosition(QSlider.TicksBothSides)
         slider.setTickInterval(10)
+        slider.setTickPosition(1)
         slider.setSingleStep(1)
+        slider.sliderReleased.connect(lambda :value_cb(key,slider.value()))
         vbox.addWidget(slider)
         vbox.addStretch(1)
         groupBox.setLayout(vbox)
