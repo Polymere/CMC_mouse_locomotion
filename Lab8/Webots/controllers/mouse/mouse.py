@@ -377,10 +377,17 @@ class Mouse(Supervisor):
         return
 
 class ReflexParams():
-    transitions={'Hip angle liftoff': -0.1235,'Ankle unloading liftoff':0.8,
-     'Hip angle touchdown':0.4, 'Ankle unloading touchdown':-10.25}
-    # MUSCLE ACTIVATION CONSTANTS
-    #stance_2_lift_off
+    transitions={'Hip angle liftoff': -0.1235,
+                'Ankle unloading liftoff':0.8,
+                 'Hip angle touchdown':0.4, 
+                 'Ankle unloading touchdown':-10.25} # Default values
+    # transitions for each step have default value, min value, max value.
+    
+    transition_boundaries={'Hip angle liftoff': [-0.2,0.2],
+                'Ankle unloading liftoff':[-1.0,1.0],
+                 'Hip angle touchdown':[-1.0,2.0], 
+                 'Ankle unloading touchdown':[-20.,20.]}
+                 
     activation={'Stance to lift off':[0.05, 0.05, 0.05, 0.05,0.05,0.05],
     'Swing to touch down':[0.05,0.05,0.05],
     'Touch down to stance':[0.05,0.05],
@@ -416,8 +423,11 @@ class ReflexParams():
     def set_transitions(self,key,value):
         print key
         try:
-            self.transitions[key]=value
-            print key +' set to ' + str(value)
+            max_val=self.transition_boundaries[key][1]
+            min_val=self.transition_boundaries[key][0]
+            self.transitions[key]=value*max_val/(100*(max_val-min_val))-min_val
+            # linear between max_val and min_val (value ranges from 0 to 100)
+            print key +' set to ' + str(self.transitions[key])
         except KeyError:
             print 'Valid keys are '
             for key in self.transitions.keys():
