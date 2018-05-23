@@ -117,6 +117,8 @@ class Mouse(Supervisor):
             # DO IT HERE
 
             reflex.COUPLING=self.params.enable['Coupling']
+            reflex.HIP_EXTENSION_RULE=self.params.enable['Hip extension rule']
+            reflex.ANKLE_UNLOADING_RULE=self.params.enable['Ankle unloading rule']
 
             # Reflex model
             reflex.step(
@@ -389,6 +391,7 @@ class MainWindow(QMainWindow):
         self.th_mouse=ThreadMouse(params_obj)
         self.sim_thread=QThread()
         self.th_mouse.moveToThread(self.sim_thread)
+        self.sim_thread.started.connect(self.th_mouse.run)
         
         
         grid = QGridLayout()
@@ -401,26 +404,32 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.createActivation('Lift off to swing',2,
                                             params_obj), 1, 1)
 
-        grid.addWidget(self.createReflex(params_obj.set_transitions,key='Hip angle liftoff'), 2, 0)
-        grid.addWidget(self.createReflex(params_obj.set_transitions,key='Ankle unloading liftoff'), 2, 1)
-        grid.addWidget(self.createReflex(params_obj.set_transitions,key='Hip angle touchdown'), 3, 0)
-        grid.addWidget(self.createReflex(params_obj.set_transitions,key='Ankle unloading touchdown'), 3, 1)
+        grid.addWidget(self.createReflex(params_obj,key='Hip angle liftoff'), 2, 0)
+        grid.addWidget(self.createReflex(params_obj,key='Ankle unloading liftoff'), 2, 1)
+        grid.addWidget(self.createReflex(params_obj,key='Hip angle touchdown'), 3, 0)
+        grid.addWidget(self.createReflex(params_obj,key='Ankle unloading touchdown'), 3, 1)
+        
+
         radio_couple=QRadioButton('Coupling')
-        radio_couple.setChecked(False)
-        radio_couple.toggled.connect(lambda : params_obj.toggle('Coupling'))
-        grid.addWidget(radio_couple,4,1)
+        radio_couple.setChecked(params_obj.enable['Coupling'])
+        radio_couple.toggled.connect(lambda : params_obj.set_enable('Coupling',radio_couple.isChecked()))
+        grid.addWidget(radio_couple,4,0)
         
-        radio_res=QRadioButton('Reset sim')
-        radio_res.setChecked(False)
-        radio_res.toggled.connect(self.reset_sim)
-        grid.addWidget(radio_res,4,2)
+        radio_ank=QRadioButton('Ankle unloading rule')
+        radio_ank.setChecked(params_obj.enable['Ankle unloading rule'])
+        radio_ank.toggled.connect(lambda : params_obj.set_enable('Ankle unloading rule',radio_ank.isChecked()))
+        grid.addWidget(radio_ank,4,1)
         
-        radio_lau=QRadioButton('launch sim')
-        radio_lau.setChecked(False)
-        radio_lau.toggled.connect(self.sim_thread.start)
+
+        radio_hip=QRadioButton('Hip extension rule')
+        radio_hip.setChecked(params_obj.enable['Hip extension rule'])
+        radio_hip.toggled.connect(lambda : params_obj.set_enable('Hip extension rule',radio_hip.isChecked()))
+        grid.addWidget(radio_hip,5,0)
         
-        grid.addWidget(radio_lau,4,0)
-        self.sim_thread.started.connect(self.th_mouse.run)
+        radio_rev=QRadioButton('Revert simulation')
+        radio_rev.setChecked(False)
+        radio_rev.toggled.connect(self.revert)
+        grid.addWidget(radio_rev,5,1)
 
         self.w=QWidget()
         self.w.setLayout(grid)
@@ -429,25 +438,23 @@ class MainWindow(QMainWindow):
         self.resize(400, 300)
         self.show()
         
-        print 'Show'
-    def reset_sim(self):
-        self.sim_thread.quit()
-        self.th_mouse.mouse.simulationResetPhysics()
-        self.th_mouse.moveToThread(self.sim_thread)
-        self.sim_thread.started.connect(self.th_mouse.run)
         self.sim_thread.start()
+        
+    def revert(self):
+        self.th_mouse.mouse.simulationRevert()
         
     def createActivation(self,key,n_values,params_obj):
         
         #print key
         value_cb=params_obj.set_activation
-        toggle_cb=params_obj.toggle
+        but_cb=params_obj.set_enable
+        
         sl_values=params_obj.activation[key]
         radio_value=params_obj.enable[key]
         groupBox = QGroupBox(key)
         radio1 = QRadioButton('Enable ?')
         radio1.setChecked(radio_value)
-        radio1.toggled.connect(lambda : toggle_cb(key))
+        radio1.toggled.connect(lambda : but_cb(key,radio1.isChecked()))
         vbox = QVBoxLayout()
         vbox.addWidget(radio1)
         for i in range(n_values):
@@ -455,19 +462,21 @@ class MainWindow(QMainWindow):
             vbox.addStretch(1)
         groupBox.setLayout(vbox)
         return groupBox
+        
     def get_slider(self,key,cb_method,init_value=5,idx=0):
         slider = QSlider(Qt.Horizontal)
         slider.setFocusPolicy(Qt.StrongFocus)
         slider.setTickPosition(QSlider.TicksBothSides)
         slider.setTickInterval(10)
         slider.setTickPosition(1)
-        print key,init_value
         slider.setValue(init_value*100)
         slider.setSingleStep(1)
         slider.sliderReleased.connect(lambda :cb_method(key,idx,slider.value()))
         return slider
         
-    def createReflex(self,value_cb,key='Default'):
+    def createReflex(self,params_obj,key='Default'):
+        value_cb=params_obj.set_transitions
+        value=params_obj.trans_val_to_percent(params_obj.transitions[key],key)
         groupBox = QGroupBox(key)
         vbox = QVBoxLayout()
         slider = QSlider(Qt.Horizontal)
@@ -476,7 +485,7 @@ class MainWindow(QMainWindow):
         slider.setTickInterval(10)
         slider.setTickPosition(5)
         slider.setSingleStep(1)
-        slider.setValue(50)
+        slider.setValue(value)
         slider.sliderReleased.connect(lambda :value_cb(key,slider.value()))
         vbox.addWidget(slider)
         vbox.addStretch(1)

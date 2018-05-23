@@ -252,7 +252,7 @@ class Reflexes(object):
     def touch_down_2_stance(self, side):
         """Transition from touch-down to stance."""
 
-        print("TOUCH_DOWN")
+        #print("TOUCH_DOWN")
 
         # CHANGE THE ACTIVATION FUNCTION OF MUSCLES TO
         # TRANSITION TO TOUCH_DOWN PHASE
@@ -324,8 +324,9 @@ class Reflexes(object):
         value: bool
             Set whether HIP EXTENSION RULE is active or not
         """
-        print(('CHANGING HIP EXTENSION RULE state to {}'.format(value)))
-        self._HIP_EXTENSION_RULE = value
+        if value !=self._HIP_EXTENSION_RULE:
+            print(('CHANGING HIP EXTENSION RULE state to {}'.format(value)))
+            self._HIP_EXTENSION_RULE = value
 
     @property
     def ANKLE_UNLOADING_RULE(self):
@@ -340,5 +341,6 @@ class Reflexes(object):
         value: bool
             Set whether ANKLE UNLOADING RULE is active or not
         """
-        print(('CHANGING ANKLE EXTENSION RULE state to {}'.format(value)))
-        self._ANKLE_UNLOADING_RULE = value
+        if value !=self._ANKLE_UNLOADING_RULE:
+            print(('CHANGING ANKLE EXTENSION RULE state to {}'.format(value)))
+            self._ANKLE_UNLOADING_RULE = value

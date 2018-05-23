@@ -17,7 +17,8 @@ class ReflexParams():
     'Lift off to swing':[0.05,0.05]}
     
     enable={'Stance to lift off':False,'Swing to touch down':False,
-    'Touch down to stance':False,'Lift off to swing':False,'Coupling':True}
+    'Touch down to stance':False,'Lift off to swing':False,'Coupling':True,
+    'Hip extension rule':True,'Ankle unloading rule':True}
     
     def __init__(self):
         print 'Initiate reflexes param'
@@ -34,6 +35,7 @@ class ReflexParams():
             print '########################'
         except:
             print 'No parameters, starting with default'
+            self.print_params()
     def set_activation(self,key,idx,value):
         try:
             self.activation[key][idx]=float(value)/100.0
@@ -45,7 +47,19 @@ class ReflexParams():
             print 'Valid keys are '
             for key in self.activation.keys():
                 print '\t %s',key
-
+    
+    def set_enable(self,key,value):
+        try:
+            self.enable[key]= value
+            self.save()
+            return
+        except KeyError:
+            print 'Valid keys are '
+            for key in self.enable.keys():
+                print '\t %s',key
+        except:
+            print 'Error in set enable'
+    
     def toggle(self,key):
         try:
             self.enable[key]= not self.enable[key]
@@ -71,7 +85,10 @@ class ReflexParams():
             for key in self.transitions.keys():
                 print '\t %s',key
                 
-
+    def trans_val_to_percent(self,val,key):
+        max_val=self.transition_boundaries[key][1]
+        min_val=self.transition_boundaries[key][0]
+        return 100*(val-min_val)/(max_val-min_val)
     def print_params(self):
         print 'Activation values :'
         for step,activation in self.activation.items():
