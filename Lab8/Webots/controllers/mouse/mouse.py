@@ -410,22 +410,26 @@ class MainWindow(QMainWindow):
         
 
         radio_couple=QRadioButton('Coupling')
+        radio_couple.setAutoExclusive(False)
         radio_couple.setChecked(params_obj.enable['Coupling'])
         radio_couple.toggled.connect(lambda : params_obj.set_enable('Coupling',radio_couple.isChecked()))
         grid.addWidget(radio_couple,4,0)
         
         radio_ank=QRadioButton('Ankle unloading rule')
+        radio_ank.setAutoExclusive(False)
         radio_ank.setChecked(params_obj.enable['Ankle unloading rule'])
         radio_ank.toggled.connect(lambda : params_obj.set_enable('Ankle unloading rule',radio_ank.isChecked()))
         grid.addWidget(radio_ank,4,1)
         
 
         radio_hip=QRadioButton('Hip extension rule')
+        radio_hip.setAutoExclusive(False)
         radio_hip.setChecked(params_obj.enable['Hip extension rule'])
         radio_hip.toggled.connect(lambda : params_obj.set_enable('Hip extension rule',radio_hip.isChecked()))
         grid.addWidget(radio_hip,5,0)
         
         radio_rev=QRadioButton('Revert simulation')
+        radio_rev.setAutoExclusive(False)
         radio_rev.setChecked(False)
         radio_rev.toggled.connect(self.revert)
         grid.addWidget(radio_rev,5,1)
@@ -453,6 +457,7 @@ class MainWindow(QMainWindow):
         radio_value=params_obj.enable[key]
         groupBox = QGroupBox(key)
         radio1 = QRadioButton('Enable ?')
+        radio1.setAutoExclusive(False)
         radio1.setChecked(radio_value)
         radio1.toggled.connect(lambda : but_cb(key,radio1.isChecked()))
         vbox = QVBoxLayout()

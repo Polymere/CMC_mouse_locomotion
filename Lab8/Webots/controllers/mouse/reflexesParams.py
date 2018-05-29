@@ -54,6 +54,7 @@ class ReflexParams():
                 print '\t %s',key
     
     def set_enable(self,key,value):
+        print key
         try:
             self.enable[key]= value
             print '------------------------------'
