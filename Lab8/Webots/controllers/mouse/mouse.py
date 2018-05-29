@@ -5,7 +5,6 @@ import os
 # Webots modules
 from controller import Supervisor
 from controller import Keyboard
-import pickle
 # MusculoSkeletal system
 from musculoskeletal import MusculoSkeletalSystem
 from reflexesParams import ReflexParams
@@ -441,6 +440,7 @@ class MainWindow(QMainWindow):
         self.sim_thread.start()
         
     def revert(self):
+        self.params_cb.save()
         self.th_mouse.mouse.simulationRevert()
         
     def createActivation(self,key,n_values,params_obj):
