@@ -142,14 +142,14 @@ def duty_cycle(foot_contact, nb_precycles, filter_threshold):
             else:
                 k = 0
                 if nb_ground < nb_air:
-                    while nb_ground >= 0:
+                    while nb_ground > 0:
                         if foot_contact[t-k]:
                             foot_contact[t-k] = 0
                             nb_air += 1
                             nb_ground -= 1
                         k += 1
                 else:
-                    while nb_air >= 0:
+                    while nb_air > 0:
                         if not foot_contact[t-k]:
                             foot_contact[t-k] = 1
                             nb_ground += 1
