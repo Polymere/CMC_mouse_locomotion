@@ -3,14 +3,14 @@ class ReflexParams():
     transitions={'Hip angle liftoff': -0.1235,
                  'Ankle unloading liftoff':0.8,
                  'Hip angle touchdown':0.4, 
-                 'Ankle unloading touchdown':-10.25} # Default values
+                 'Ankle unloading touchdown':-1.25} # Default values
     
     # transitions for each step have default value, min value, max value.
     
-    transition_boundaries={'Hip angle liftoff': [-0.2,0.2],
-                           'Ankle unloading liftoff':[-1.0,1.0],
-                           'Hip angle touchdown':[-1.0,2.0], 
-                           'Ankle unloading touchdown':[-20.,20.]}
+    transition_boundaries={'Hip angle liftoff': [-0.3705,0.1235],
+                           'Ankle unloading liftoff':[-0.8,2.4],
+                           'Hip angle touchdown':[-0.4,1.2], 
+                           'Ankle unloading touchdown':[-3.75,1.25]}
                  
     activation={'Stance to lift off':[0.05, 0.05, 0.05, 0.05,0.05,0.05],
                 'Swing to touch down':[0.05,0.05,0.05],

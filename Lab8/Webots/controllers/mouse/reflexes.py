@@ -138,6 +138,7 @@ class Reflexes(object):
         if (self.ground_contact[side]) and (
                 self.leg_curr_phase[side] == 'TOUCH_DOWN') and (
                     self.leg_prev_phase[side] == 'SWING'):
+            print side,': Stance'
             self.leg_curr_phase[side] = 'STANCE'
             self.leg_prev_phase[side] = 'TOUCH_DOWN'
 
@@ -149,6 +150,7 @@ class Reflexes(object):
                     self.leg_curr_phase[side] == 'STANCE') and (
             self.leg_prev_phase[side] == 'TOUCH_DOWN') and(
                     contra_lateral_state):
+            print side,': Lift off'
             self.leg_curr_phase[side] = 'LIFT_OFF'
             self.leg_prev_phase[side] = 'STANCE'
 
@@ -157,6 +159,7 @@ class Reflexes(object):
         elif (not self.ground_contact[side]) and (
                 self.leg_curr_phase[side] == 'LIFT_OFF') and (
                     self.leg_prev_phase[side] == 'STANCE'):
+            print side,': Swing'
             self.leg_curr_phase[side] = 'SWING'
             self.leg_prev_phase[side] = 'LIFT_OFF'
 
@@ -166,6 +169,7 @@ class Reflexes(object):
                 self.angles[side + 'H_J_KNEE'] < ANKLE_UNLOADING_TOUCHDOWN) and (
                 self.leg_curr_phase[side] == 'SWING') and (
                 self.leg_prev_phase[side] == 'LIFT_OFF'):
+            print side,': Touch down'
             self.leg_curr_phase[side] = 'TOUCH_DOWN'
             self.leg_prev_phase[side] = 'SWING'
 
