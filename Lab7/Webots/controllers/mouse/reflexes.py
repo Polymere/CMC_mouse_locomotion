@@ -42,26 +42,24 @@ class Reflexes(object):
         self.forces = muscle_forces
         # Update ground contact
         self.ground_contact = ground_contact
-        if self.params.enable.values():     
-            self.state_transition('L')
-            # RIGHT LEG
-            self.state_transition('R')
-    
         if self.params.enable['Stance to lift off']:
             self.stance_2_lift_off('L')
             self.stance_2_lift_off('R')
-    
-        if self.params.enable['Lift off to swing']:
+        elif self.params.enable['Lift off to swing']:
             self.lift_off_2_swing('L')
             self.lift_off_2_swing('R')
-    
-        if self.params.enable['Swing to touch down']:
+        elif self.params.enable['Swing to touch down']:
             self.swing_2_touch_down('L')
             self.swing_2_touch_down('R')
     
-        if self.params.enable['Touch down to stance']:
+        elif self.params.enable['Touch down to stance']:
             self.touch_down_2_stance('L')
             self.touch_down_2_stance('R')
+        else:
+        
+            self.state_transition('L')
+            # RIGHT LEG
+            self.state_transition('R')
         return self.activations
 
     def contra_lateral_side(self, side):
@@ -109,6 +107,7 @@ class Reflexes(object):
         if (self.ground_contact[side]) and (
                 self.leg_curr_phase[side] == 'TOUCH_DOWN') and (
                     self.leg_prev_phase[side] == 'SWING'):
+            print 'STANCE'
             self.leg_curr_phase[side] = 'STANCE'
             self.leg_prev_phase[side] = 'TOUCH_DOWN'
 
@@ -120,6 +119,7 @@ class Reflexes(object):
                     self.leg_curr_phase[side] == 'STANCE') and (
                         self.leg_prev_phase[side] == 'TOUCH_DOWN') and (
                             self.leg_curr_phase[contra_side] == 'STANCE'):
+            print 'LIFT OFF'
             self.leg_curr_phase[side] = 'LIFT_OFF'
             self.leg_prev_phase[side] = 'STANCE'
 
@@ -128,7 +128,7 @@ class Reflexes(object):
         elif (not self.ground_contact[side]) and (
                 self.leg_curr_phase[side] == 'LIFT_OFF') and (
                     self.leg_prev_phase[side] == 'STANCE'):
-
+            print 'SWING'
             self.leg_curr_phase[side] = 'SWING'
             self.leg_prev_phase[side] = 'LIFT_OFF'
 
@@ -144,6 +144,7 @@ class Reflexes(object):
         ) and (
             self.leg_prev_phase[side] == 'LIFT_OFF'
         ):
+            print 'TOUCH DOWN'
             self.leg_curr_phase[side] = 'TOUCH_DOWN'
             self.leg_prev_phase[side] = 'SWING'
 
@@ -178,7 +179,7 @@ class Reflexes(object):
         # CHANGE THE ACTIVATION FUNCTION OF MUSCLES TO
         # TRANSITION FROM STANCE PHASE
 
-        # print("STANCE")
+        print("STANCE")
 
         # MUSCLE ACTIVATION CONSTANTS
         K1 = self.params.activation['Stance to lift off'][0]
@@ -206,7 +207,7 @@ class Reflexes(object):
     def swing_2_touch_down(self, side):
         """Transition from swing to touch-down."""
 
-        # print("SWING")
+        print("SWING")
 
         # CHANGE THE ACTIVATION FUNCTION OF MUSCLES TO
         # TRANSITION TO SWING PHASE
@@ -231,7 +232,7 @@ class Reflexes(object):
     def touch_down_2_stance(self, side):
         """Transition from touch-down to stance."""
 
-        # print("TOUCH_DOWN")
+        print("TOUCH_DOWN")
 
         # CHANGE THE ACTIVATION FUNCTION OF MUSCLES TO
         # TRANSITION TO TOUCH_DOWN PHASE
@@ -253,7 +254,7 @@ class Reflexes(object):
     def lift_off_2_swing(self, side):
         """Transition from lift-off to swing."""
 
-        # print("LIFT_OFF")
+        print("LIFT_OFF")
 
         # CHANGE THE ACTIVATION FUNCTION OF MUSCLES TO
         # TRANSITION TO LIFT_OFF PHASE

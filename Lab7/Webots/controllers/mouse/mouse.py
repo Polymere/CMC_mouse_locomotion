@@ -10,6 +10,7 @@ from controller import Keyboard
 from musculoskeletal import MusculoSkeletalSystem
 
 from reflexes import Reflexes
+from reflexesParams import ReflexParams
 
 # Muscle Visualization
 from muscle_visualization import MuscleVisualization
@@ -284,71 +285,7 @@ class Mouse(Supervisor):
 
 
 
-class ReflexParams():
-    transitions={'Hip angle liftoff': -0.1235,'Ankle unloading liftoff':0.8,
-     'Hip angle touchdown':0.4, 'Ankle unloading touchdown':-10.25}
-    # MUSCLE ACTIVATION CONSTANTS
-    #stance_2_lift_off
-    activation={'Stance to lift off':[0.05, 0.05, 0.05, 0.05,0.05,0.05],
-    'Swing to touch down':[0.05,0.05,0.05],
-    'Touch down to stance':[0.05,0.05],
-    'Lift off to swing':[0.05,0.05]}
-    
-    enable={'Stance to lift off':False,'Swing to touch down':False,
-    'Touch down to stance':False,'Lift off to swing':False}
-    
-    def __init__(self):
-            print 'Initiate reflexes param'
 
-            
-    def set_activation(self,key,idx,value):
-        print value
-        try:
-            self.activation[key][idx]=float(value)/100.0
-            print key,idx,value
-        except IndexError:
-            print 'Valid indexes are between 0 and %d', len(self.activation[key])
-        except KeyError:
-            print 'Valid keys are '
-            for key in self.activation.keys():
-                print '\t %s',key
-
-    def toggle(self,key):
-        try:
-            self.enable[key]= not self.enable[key]
-            print 'Togeule',key
-            return
-        except KeyError:
-            print 'Valid keys are '
-            for key in self.enable.keys():
-                print '\t %s',key
-        except:
-            print 'Error in toggle'
-
-    def set_transitions(self,key,value):
-        try:
-            self.transitions[key]=value
-        except KeyError:
-            print 'Valid keys are '
-            for key in self.transitions.keys():
-                print '\t %s',key
-        except:
-            print 'Error in set transitions'
-
-    def print_params(self):
-        print 'Activation values :'
-        for step,activation in self.activation.items():
-            print step
-            print activation
-        print 'Transition triggers :'
-        for trigger,transition in self.transitions.items():
-            print trigger
-            print transition
-        print 'Activated steps are :'
-        for step,activated in self.enable.items():
-            if activated:
-                print step
-          
 class MainWindow(QMainWindow):
     def __init__(self,params_obj):
         super(MainWindow, self).__init__()
@@ -356,25 +293,32 @@ class MainWindow(QMainWindow):
         self.params_cb=params_obj
 
         self.th_mouse=ThreadMouse(params_obj)
-        
-        grid = QGridLayout()
-        grid.addWidget(self.createActivation('Stance to lift off',6,
-                                            params_obj.set_activation,params_obj.toggle), 0, 0)
-        grid.addWidget(self.createActivation('Swing to touch down',3,
-                                            params_obj.set_activation,params_obj.toggle), 0, 1)
-        grid.addWidget(self.createActivation('Touch down to stance',2,
-                                            params_obj.set_activation,params_obj.toggle), 1, 0)
-        grid.addWidget(self.createActivation('Lift off to swing',2,
-                                            params_obj.set_activation,params_obj.toggle), 1, 1)
-
-        grid.addWidget(self.createReflex(key='Hip angle liftoff'), 2, 0)
-        grid.addWidget(self.createReflex(key='Ankle unloading liftoff'), 2, 1)
-        grid.addWidget(self.createReflex(key='Hip angle touchdown'), 3, 0)
-        grid.addWidget(self.createReflex(key='Ankle unloading touchdown'), 3, 1)
         self.sim_thread=QThread()
         self.th_mouse.moveToThread(self.sim_thread)
         self.sim_thread.started.connect(self.th_mouse.run)
         
+        
+        grid = QGridLayout()
+        grid.addWidget(self.createActivation('Stance to lift off',6,
+                                            params_obj), 0, 0)
+        grid.addWidget(self.createActivation('Swing to touch down',3,
+                                            params_obj), 0, 1)
+        grid.addWidget(self.createActivation('Touch down to stance',2,
+                                            params_obj), 1, 0)
+        grid.addWidget(self.createActivation('Lift off to swing',2,
+                                            params_obj), 1, 1)
+
+        grid.addWidget(self.createReflex(params_obj,key='Hip angle liftoff'), 2, 0)
+        grid.addWidget(self.createReflex(params_obj,key='Ankle unloading liftoff'), 2, 1)
+        grid.addWidget(self.createReflex(params_obj,key='Hip angle touchdown'), 3, 0)
+        grid.addWidget(self.createReflex(params_obj,key='Ankle unloading touchdown'), 3, 1)
+        
+        
+        radio_rev=QRadioButton('Revert simulation')
+        radio_rev.setAutoExclusive(False)
+        radio_rev.setChecked(False)
+        radio_rev.toggled.connect(self.revert)
+        grid.addWidget(radio_rev,5,1)
 
         self.w=QWidget()
         self.w.setLayout(grid)
@@ -382,44 +326,62 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Parameter tuning")
         self.resize(400, 300)
         self.show()
+        
         self.sim_thread.start()
-        print 'Show'
-
-    def createActivation(self,key,n_values,value_cb,toggle_cb):
+        
+    def revert(self):
+        self.params_cb.save()
+        self.th_mouse.mouse.simulationRevert()
+        
+    def createActivation(self,key,n_values,params_obj):
+        
         #print key
+        value_cb=params_obj.set_activation
+        but_cb=params_obj.set_enable
+        
+        sl_values=params_obj.activation[key]
+        radio_value=params_obj.enable[key]
         groupBox = QGroupBox(key)
-        radio1 = QRadioButton('Enable ?')
-        radio1.setChecked(False)
-        radio1.toggled.connect(lambda : toggle_cb(key))
+        radio1 = QRadioButton('Force ?')
+        #radio1.setAutoExclusive(False)
+        radio1.setChecked(radio_value)
+        radio1.toggled.connect(lambda : but_cb(key,radio1.isChecked()))
         vbox = QVBoxLayout()
         vbox.addWidget(radio1)
         for i in range(n_values):
-            vbox.addWidget(self.get_slider(key,value_cb,i))
+            vbox.addWidget(self.get_slider(key,value_cb,init_value=sl_values[i],idx=i))
             vbox.addStretch(1)
         groupBox.setLayout(vbox)
         return groupBox
-    def get_slider(self,key,cb_method,idx=0):
+        
+    def get_slider(self,key,cb_method,init_value=5,idx=0):
         slider = QSlider(Qt.Horizontal)
         slider.setFocusPolicy(Qt.StrongFocus)
         slider.setTickPosition(QSlider.TicksBothSides)
         slider.setTickInterval(10)
         slider.setTickPosition(1)
+        slider.setValue(init_value*100)
         slider.setSingleStep(1)
         slider.sliderReleased.connect(lambda :cb_method(key,idx,slider.value()))
         return slider
-    def createReflex(self,key='Default'):
+        
+    def createReflex(self,params_obj,key='Default'):
+        value_cb=params_obj.set_transitions
+        value=params_obj.trans_val_to_percent(params_obj.transitions[key],key)
         groupBox = QGroupBox(key)
         vbox = QVBoxLayout()
         slider = QSlider(Qt.Horizontal)
         slider.setFocusPolicy(Qt.StrongFocus)
         slider.setTickPosition(QSlider.TicksBothSides)
         slider.setTickInterval(10)
+        slider.setTickPosition(5)
         slider.setSingleStep(1)
+        slider.setValue(value)
+        slider.sliderReleased.connect(lambda :value_cb(key,slider.value()))
         vbox.addWidget(slider)
         vbox.addStretch(1)
         groupBox.setLayout(vbox)
         return groupBox
-    
 
         
 
@@ -428,10 +390,7 @@ if __name__ == '__main__':
 
 
     reflex_params=ReflexParams()
-
     app = QApplication([])
     slider_win=MainWindow(reflex_params)
     app.exec_()
-    #mouse.run(reflex_params)
-    #sys.exit(app.exec_())
-    #mouse.run(reflex_params)
+
