@@ -379,7 +379,7 @@ class Mouse(Supervisor):
         )
         self.params.save()
         return
-    def save_data(self):
+    def log_data(self):
         print 'Saving data'
         try:
             os.stat(RESULTS_DIRECTORY)
@@ -496,7 +496,7 @@ class MainWindow(QMainWindow):
         
     def revert(self):
         self.params_cb.save()
-        self.th_mouse.mouse.save_data()
+        self.th_mouse.mouse.log_data()
         self.th_mouse.mouse.simulationRevert()
         
     def createActivation(self,key,n_values,params_obj):
