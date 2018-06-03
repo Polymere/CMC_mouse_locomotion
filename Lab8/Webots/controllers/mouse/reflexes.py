@@ -52,27 +52,31 @@ class Reflexes(object):
         # Update ground contact
         self.ground_contact = ground_contact
 
-        if self.params.enable.values():     
-            self.state_transition('L')
-            # RIGHT LEG
-            self.state_transition('R')
+
     
         if self.params.enable['Stance to lift off']:
             self.stance_2_lift_off('L')
             self.stance_2_lift_off('R')
+            return self.activations
+            
     
         if self.params.enable['Lift off to swing']:
             self.lift_off_2_swing('L')
             self.lift_off_2_swing('R')
+            return self.activations
     
         if self.params.enable['Swing to touch down']:
             self.swing_2_touch_down('L')
             self.swing_2_touch_down('R')
+            return self.activations
     
         if self.params.enable['Touch down to stance']:
             self.touch_down_2_stance('L')
             self.touch_down_2_stance('R')
-
+            return self.activations
+        self.state_transition('L')
+            # RIGHT LEG
+        self.state_transition('R')
         return self.activations
 
     def contra_lateral_side(self, side):
