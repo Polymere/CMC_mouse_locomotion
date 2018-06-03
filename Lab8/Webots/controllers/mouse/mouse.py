@@ -379,7 +379,58 @@ class Mouse(Supervisor):
         )
         self.params.save()
         return
-
+    def save_data(self):
+        print 'Saving data'
+        try:
+            os.stat(RESULTS_DIRECTORY)
+        except:
+            os.mkdir(RESULTS_DIRECTORY)
+        np.save(
+            RESULTS_DIRECTORY + "time.npy",
+            self.time[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "ankle_l_trajectory.npy",
+            self.ankle_l_trajectory[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "ankle_r_trajectory.npy",
+            self.ankle_r_trajectory[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "foot_r_contact.npy",
+            self.foot_r_contact[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "foot_l_contact.npy",
+            self.foot_l_contact[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "muscle_lh_activations.npy",
+            self.muscle_lh_activations[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "muscle_rh_activations.npy",
+            self.muscle_rh_activations[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "muscle_lh_forces.npy",
+            self.muscle_lh_forces[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "muscle_rh_forces.npy",
+            self.muscle_rh_forces[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "joint_lh_positions.npy",
+            self.joint_lh_positions[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "joint_rh_positions.npy",
+            self.joint_rh_positions[:self.iteration, :]
+        )
+        self.params.save()
+        return
 
 class MainWindow(QMainWindow):
     def __init__(self,params_obj):
@@ -445,6 +496,7 @@ class MainWindow(QMainWindow):
         
     def revert(self):
         self.params_cb.save()
+        self.th_mouse.mouse.save_data()
         self.th_mouse.mouse.simulationRevert()
         
     def createActivation(self,key,n_values,params_obj):
@@ -456,7 +508,7 @@ class MainWindow(QMainWindow):
         sl_values=params_obj.activation[key]
         radio_value=params_obj.enable[key]
         groupBox = QGroupBox(key)
-        radio1 = QRadioButton('Enable ?')
+        radio1 = QRadioButton('Force ?')
         radio1.setAutoExclusive(False)
         radio1.setChecked(radio_value)
         radio1.toggled.connect(lambda : but_cb(key,radio1.isChecked()))
@@ -476,7 +528,7 @@ class MainWindow(QMainWindow):
         slider.setTickPosition(1)
         slider.setValue(init_value*100)
         slider.setSingleStep(1)
-        slider.sliderReleased.connect(lambda :cb_method(key,idx,slider.value()))
+        slider.valueChanged.connect(lambda :cb_method(key,idx,slider.value()))
         return slider
         
     def createReflex(self,params_obj,key='Default'):
