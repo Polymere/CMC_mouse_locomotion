@@ -93,6 +93,7 @@ class Mouse(Supervisor):
 
     def __del__(self):
         """ Deletion """
+        print 'Saving results'
         try:
             os.stat(RESULTS_DIRECTORY)
         except:
@@ -107,7 +108,23 @@ class Mouse(Supervisor):
         )
 
         return
-        
+    def save_results(self):
+    
+        print 'Saving results'
+        try:
+            os.stat(RESULTS_DIRECTORY)
+        except:
+            os.mkdir(RESULTS_DIRECTORY)
+        np.save(
+            RESULTS_DIRECTORY + "ankle_l_trajectory.npy",
+            self.ankle_l_trajectory[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "ankle_r_trajectory.npy",
+            self.ankle_r_trajectory[:self.iteration, :]
+        )
+
+        return
     def set_params(self,params):
         print 'Setting params to '
         params.print_params()
@@ -331,6 +348,7 @@ class MainWindow(QMainWindow):
         
     def revert(self):
         self.params_cb.save()
+        self.th_mouse.mouse.save_results()
         self.th_mouse.mouse.simulationRevert()
         
     def createActivation(self,key,n_values,params_obj):
@@ -362,7 +380,7 @@ class MainWindow(QMainWindow):
         slider.setTickPosition(1)
         slider.setValue(init_value*100)
         slider.setSingleStep(1)
-        slider.sliderReleased.connect(lambda :cb_method(key,idx,slider.value()))
+        slider.valueChanged.connect(lambda :cb_method(key,idx,slider.value()))
         return slider
         
     def createReflex(self,params_obj,key='Default'):

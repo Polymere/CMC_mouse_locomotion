@@ -76,7 +76,9 @@ class Mouse(Supervisor):
 
         # Time
         self.time = np.zeros([BUFFER_SIZE_TRAJECTORIES, 1])
-
+        self.coupling = np.zeros([BUFFER_SIZE_TRAJECTORIES, 1])
+        self.hip_rule = np.zeros([BUFFER_SIZE_TRAJECTORIES, 1])
+        self.ankle_rule = np.zeros([BUFFER_SIZE_TRAJECTORIES, 1])
         # Foot Trajectories [axis]
         self.ankle_r_trajectory = np.zeros([BUFFER_SIZE_TRAJECTORIES, 3])
         self.ankle_l_trajectory = np.zeros([BUFFER_SIZE_TRAJECTORIES, 3])
@@ -150,6 +152,9 @@ class Mouse(Supervisor):
 
             # Save the current time step data
             self.save_data()
+            self.coupling[self.iteration]=reflex.COUPLING
+            self.hip_rule[self.iteration]=reflex.HIP_EXTENSION_RULE
+            self.ankle_rule[self.iteration]=reflex.ANKLE_UNLOADING_RULE
 
     def initialize_webots_keyboard(self):
         """ Initialize webots keyboard """
@@ -325,6 +330,7 @@ class Mouse(Supervisor):
         self.joint_rh_positions[self.iteration, :] = (
             joint_rh_positions
         )
+        
 
     def __del__(self):
         """ Deletion """
@@ -428,6 +434,18 @@ class Mouse(Supervisor):
         np.save(
             RESULTS_DIRECTORY + "joint_rh_positions.npy",
             self.joint_rh_positions[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "coupling.npy",
+            self.coupling[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "hip_rule.npy",
+            self.hip_rule[:self.iteration, :]
+        )
+        np.save(
+            RESULTS_DIRECTORY + "ankle_rule.npy",
+            self.ankle_rule[:self.iteration, :]
         )
         self.params.save()
         return

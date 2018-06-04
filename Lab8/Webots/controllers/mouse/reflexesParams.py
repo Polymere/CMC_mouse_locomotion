@@ -1,14 +1,14 @@
 import json
 class ReflexParams():
     transitions={'Hip angle liftoff': -0.1235,
-                 'Ankle unloading liftoff':0.8,
+                 'Ankle unloading liftoff':0.25,
                  'Hip angle touchdown':0.4, 
                  'Ankle unloading touchdown':-1.25} # Default values
     
     # transitions for each step have default value, min value, max value.
     
     transition_boundaries={'Hip angle liftoff': [-0.3705,0.1235],
-                           'Ankle unloading liftoff':[-0.8,2.4],
+                           'Ankle unloading liftoff':[-0.25,0.75],
                            'Hip angle touchdown':[-0.4,1.2], 
                            'Ankle unloading touchdown':[-3.75,1.25]}
                  
