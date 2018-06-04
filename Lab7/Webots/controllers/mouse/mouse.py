@@ -328,7 +328,7 @@ class MainWindow(QMainWindow):
         grid.addWidget(self.createReflex(params_obj,key='Hip angle liftoff'), 2, 0)
         grid.addWidget(self.createReflex(params_obj,key='Ankle unloading liftoff'), 2, 1)
         grid.addWidget(self.createReflex(params_obj,key='Hip angle touchdown'), 3, 0)
-        grid.addWidget(self.createReflex(params_obj,key='Ankle unloading touchdown'), 3, 1)
+        grid.addWidget(self.createReflex(params_obj,key='Knee angle touchdown'), 3, 1)
         
         
         radio_rev=QRadioButton('Revert simulation')

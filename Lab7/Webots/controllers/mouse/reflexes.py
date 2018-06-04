@@ -101,7 +101,7 @@ class Reflexes(object):
         # PARAMETERS TO BE TUNED FOR HIP/KNEE ANGLE REFLEXES
         # EXECUTION OF TOUCH_DOWN PHASE
         HIP_ANGLE_TOUCHDOWN = self.params.transitions['Hip angle touchdown']
-        ANKLE_UNLOADING_TOUCHDOWN = self.params.transitions['Ankle unloading touchdown']
+        KNEE_ANGLE_TOUCHDOWN = self.params.transitions['Knee angle touchdown']
 
         # EXECUTE STANCE PHASE AFTER GROUND CONTACT
         if (self.ground_contact[side]) and (
@@ -138,7 +138,7 @@ class Reflexes(object):
         elif (
                 self.angles[side + 'H_J_HIP'] > HIP_ANGLE_TOUCHDOWN
         ) and (
-            self.angles[side + 'H_J_KNEE'] < ANKLE_UNLOADING_TOUCHDOWN
+            self.angles[side + 'H_J_KNEE'] < KNEE_ANGLE_TOUCHDOWN
         ) and (
             self.leg_curr_phase[side] == 'SWING'
         ) and (

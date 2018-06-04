@@ -114,7 +114,7 @@ class Reflexes(object):
         # PARAMETERS TO BE TUNED FOR HIP/KNEE ANGLE REFLEXES
         # EXECUTION OF TOUCH_DOWN PHASE
         HIP_ANGLE_TOUCHDOWN = self.params.transitions['Hip angle touchdown']
-        ANKLE_UNLOADING_TOUCHDOWN = self.params.transitions['Ankle unloading touchdown']
+        KNEE_ANGLE_TOUCHDOWN = self.params.transitions['Knee angle touchdown']
 
         # COUPLING BETWEEN THE LEGS
         if self.COUPLING:
@@ -170,7 +170,7 @@ class Reflexes(object):
         # EXECUTE TOUCH_DOWN PHASE AFTER HIP AND KNEE ANGLE REFLEXES
 
         elif (self.angles[side + 'H_J_HIP'] > HIP_ANGLE_TOUCHDOWN) and ( # !!!!! CHANGED FROM KNEE
-                self.angles[side + 'H_J_KNEE'] < ANKLE_UNLOADING_TOUCHDOWN) and (
+                self.angles[side + 'H_J_KNEE'] < KNEE_ANGLE_TOUCHDOWN) and (
                 self.leg_curr_phase[side] == 'SWING') and (
                 self.leg_prev_phase[side] == 'LIFT_OFF'):
             print side,': Touch down'
